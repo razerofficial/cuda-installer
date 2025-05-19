@@ -3,7 +3,7 @@
 
 # available versions
 python_versions=( "3.9" "3.10" "3.11" "3.12" ) 
-cuda_versions=( "11.8.0" "12.4.0" "12.6.1" "12.8.1" )
+cuda_versions=( "11.8" "12.4" "12.6" "12.8" )
 additional=( "PyTorch" "TensorFlow" "None" )
 
 selected_python=""
@@ -15,6 +15,13 @@ PYTHON_OPTIONS=()
 CUDA_OPTIONS=()
 ADDITIONAL_OPTIONS=()
 
+
+trap ctrl_c INT
+ctrl_c() {
+    dialog --clear
+    echo "Exiting..."
+    exit 1
+}
 
 exitcheck() {
     if [ $? -ne 0 ]; then
@@ -72,6 +79,13 @@ selected=$(echo "$selected" | tr -d "'")
 selected_python=$(echo "$selected" | cut -f1)
 selected_cuda=$(echo "$selected" | cut -f2)
 selected_additional=$(echo "$selected" | cut -f3)
+
+# reappend cuda version
+if [ "${selected_cuda:0:2}" == "11" ]; then
+    selected_cuda="$selected_cuda.0"
+elif [ "${selected_cuda:0:2}" == "12" ]; then
+    selected_cuda="$selected_cuda.1"
+fi
 
 if [ -z "$selected_python" ] || [ -z "$selected_cuda" ] || [ -z "$selected_additional" ]; then
     dialog --clear
